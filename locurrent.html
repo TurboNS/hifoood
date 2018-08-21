@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Basic GeoLocation Map</title>
+    <!-- Google Maps and Places API -->
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
+    
+    <!-- jQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript">
+    function initGeolocation()
+    {
+            if( navigator.geolocation )
+            {
+
+              // Call getCurrentPosition with success and failure callbacks
+              navigator.geolocation.getCurrentPosition( success, fail );
+        }
+        else
+        {
+              alert("Sorry, your browser does not support geolocation services.");
+        }
+    }
+
+     var map;
+     function success(position)
+     {
+           // Define the coordinates as a Google Maps LatLng Object
+           var coords = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+           // Prepare the map options
+           var mapOptions =
+          {
+                      zoom: 14,
+                      center: coords,
+                      mapTypeControl: false,
+                      navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
+                      mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            // Create the map, and place it in the map_canvas div
+            map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+			
+			//search for schools within 1500 metres of our current location, and as a marker use school.png
+			//placesRequest('Schools',coords,1500,['school'],'images/school.png');
+
+      placesRequest('Restaurants',coords,1500,['restaurant'],'image/foodiCon.png');
+
+
+            // Place the initial marker
+            var marker = new google.maps.Marker({
+                      position: coords,
+                      map: map,
+                      title: "Your current location!"
+            });
+			
+        }
+
+        function fail()
+        {
+              // Could not obtain location
+        }
+		
+		//Request places from Google
+		function placesRequest(title,latlng,radius,types,icon)
+		{
+			//Parameters for our places request
+			var request = {
+				location: latlng,
+				radius: radius,
+				types: types
+			};
+			//Make the service call to google
+			var callPlaces = new google.maps.places.PlacesService(map);
+			callPlaces.search(request, function(results,status){
+				//trace what Google gives us back
+				$.each(results, function(i,place){
+					var placeLoc = place.geometry.location;
+					 var thisplace = new google.maps.Marker({
+						 map: map,
+						 position: place.geometry.location,
+						 icon: icon,
+						 title: place.name
+					 });
+				})
+			});
+			
+		}
+		
+	
+        </script>
+</head>
+<body onload="initGeolocation();">
+    <div style="position:absolute; width:380px; height: 100%; overflow:auto; float:left; padding-left:10px; padding-right:10px;">
+        <h1>Restaurant nearby</h1>
+        <p> Here's some restaurant near by</p>
+        <p>A restaurant or an eatery, is a business which prepares and serves food and drinks to customers in exchange for money. Meals are generally served and eaten on the premises, but many restaurants also offer take-out and food delivery services, and some offer only take-out and delivery. Restaurants vary greatly in appearance and offerings, including a wide variety of cuisines and service models ranging from inexpensive fast food restaurants and cafeterias to mid-priced family restaurants, to high-priced luxury establishments.
+
+In Western countries, most mid- to high-range restaurants serve alcoholic beverages such as beer and wine. Some restaurants serve all the major meals, such as breakfast, lunch, and dinner (e.g., major fast food chains, diners, hotel restaurants, and airport restaurants). Other restaurants may only serve a single meal (e.g., a pancake house may only serve breakfast) or they may serve two meals (e.g., lunch and dinner) or even a kids' meal.
+		    </p>
+    </div>
+    <!-- map div container -->
+
+<div id="map_canvas" style="height:500px; margin-left:400px; border-right: 1px solid #666666; border-bottom: 1px solid #666666; border-top: 1px solid #AAAAAA; border-left: 1px solid #AAAAAA;"></div>
+</body>
+
+
+
+</html>
